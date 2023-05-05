@@ -24,7 +24,7 @@ class TextSentimentAnalyser:
         if n == 0:
             print(f"No 10k found for {company} in {year}.")
             return 0
-        directory_path = f".\\sec-edgar-filings\\{company}\\10-K"
+        directory_path = os.path.join("sec-edgar-filings", company, "10-K")
         html_file_path = glob.glob(os.path.join(directory_path, '*', 'filing-details.html'))[0]
         # Read the contents of the HTML file into memory as a string
         with open(html_file_path, 'r', encoding='utf-8') as file:
@@ -95,7 +95,7 @@ class TextSentimentAnalyser:
         filling_unprocessed = self.fetch_10k(company, year)
         # Check if 10-K filing was found
         if filling_unprocessed == 0:
-            return None
+            return 'NoSentiment'
         filling_preprocessed = self.preprocess_10k(filling_unprocessed)
         sentiment = self.sentiment_counts(filling_preprocessed, self.sentiment_dict)
         return sentiment
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     text_analyzer = TextSentimentAnalyser(lm_word_list_df)
     # 3. Pass in company ticker and year to calculate sentiment. If company does not have 10k
     # that year it will return null
-    sentiment = text_analyzer.get_sentiment('AAPL', 2012)
+    sentiment = text_analyzer.get_sentiment('MSFT', 2012)
     print(sentiment)
 
 
