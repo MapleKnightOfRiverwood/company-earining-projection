@@ -25,14 +25,31 @@ class TextSentimentAnalyser:
             print(f"No 10k found for {company} in {year}.")
             return 0
         directory_path = os.path.join("sec-edgar-filings", company, "10-K")
-        html_file_path = glob.glob(os.path.join(directory_path, '*', 'filing-details.html'))[0]
-        # Read the contents of the HTML file into memory as a string
-        with open(html_file_path, 'r', encoding='utf-8', errors='replace') as file:
-            html_content = file.read()
-        # Use beautiful soup to convert html to plain text
-        soup = BeautifulSoup(html_content, 'html.parser')
-        plain_text = soup.get_text()
-        # Delete the html file
+        html_files = glob.glob(os.path.join(directory_path, '*', 'filing-details.html'))
+        txt_files = glob.glob(os.path.join(directory_path, '*', 'filing-details.txt'))
+
+        if not html_files and not txt_files:
+            print(f"No 'filing-details.html' or 'filing-details.txt' found for {company} in {year}.")
+            return 0
+
+        if html_files:
+            file_path = html_files[0]
+        else:
+            print('The 10k is in txt instead of html')
+            file_path = txt_files[0]
+
+        # Read the contents of the file into memory as a string
+        with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
+            content = file.read()
+
+        # If the file is an HTML file, use BeautifulSoup to convert it to plain text
+        if file_path.endswith('.html'):
+            soup = BeautifulSoup(content, 'html.parser')
+            plain_text = soup.get_text()
+        else:
+            plain_text = content
+
+        # Delete the downloaded files
         shutil.rmtree(os.path.join('sec-edgar-filings', company))
         return plain_text
 
@@ -92,13 +109,17 @@ class TextSentimentAnalyser:
 
     # Wrapper function
     def get_sentiment(self, company, year):
-        filling_unprocessed = self.fetch_10k(company, year)
-        # Check if 10-K filing was found
-        if filling_unprocessed == 0:
+        try:
+            filling_unprocessed = self.fetch_10k(company, year)
+            # Check if 10-K filing was found
+            if filling_unprocessed == 0:
+                return 'NoSentiment'
+            filling_preprocessed = self.preprocess_10k(filling_unprocessed)
+            sentiment = self.sentiment_counts(filling_preprocessed, self.sentiment_dict)
+            return sentiment
+        except Exception as e:
+            print(f"An error occurred while processing the sentiment for {company} in {year}: {e}")
             return 'NoSentiment'
-        filling_preprocessed = self.preprocess_10k(filling_unprocessed)
-        sentiment = self.sentiment_counts(filling_preprocessed, self.sentiment_dict)
-        return sentiment
 
 
 # How to use the object
@@ -109,7 +130,7 @@ if __name__ == '__main__':
     text_analyzer = TextSentimentAnalyser(lm_word_list_df)
     # 3. Pass in company ticker and year to calculate sentiment. If company does not have 10k
     # that year it will return null
-    sentiment = text_analyzer.get_sentiment('KBAL', 2010)
+    sentiment = text_analyzer.get_sentiment('AEMD', 2010)
     print(sentiment)
 
 
