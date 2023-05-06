@@ -33,7 +33,7 @@ class TextSentimentAnalyser:
         soup = BeautifulSoup(html_content, 'html.parser')
         plain_text = soup.get_text()
         # Delete the html file
-        shutil.rmtree(os.path.join('.\\sec-edgar-filings', company))
+        shutil.rmtree(os.path.join('sec-edgar-filings', company))
         return plain_text
 
 
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     text_analyzer = TextSentimentAnalyser(lm_word_list_df)
     # 3. Pass in company ticker and year to calculate sentiment. If company does not have 10k
     # that year it will return null
-    sentiment = text_analyzer.get_sentiment('MSFT', 2012)
+    sentiment = text_analyzer.get_sentiment('AAPL', 2012)
     print(sentiment)
 
 
