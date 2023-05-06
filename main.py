@@ -7,5 +7,14 @@ lm_word_list_df = pd.read_csv('Loughran-McDonald_MasterDictionary_1993-2021.csv'
 text_analyzer = TextSentimentAnalyser(lm_word_list_df)
 # 3. Pass in company ticker and year to calculate sentiment. If company does not have 10k
 # that year it will return null
-sentiment = text_analyzer.get_sentiment('AAPL', 2012)
+sentiment = text_analyzer.get_sentiment('KBAL', 2010)
 print(sentiment)
+
+
+
+
+
+
+
+
+

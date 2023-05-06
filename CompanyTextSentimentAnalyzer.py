@@ -27,7 +27,7 @@ class TextSentimentAnalyser:
         directory_path = os.path.join("sec-edgar-filings", company, "10-K")
         html_file_path = glob.glob(os.path.join(directory_path, '*', 'filing-details.html'))[0]
         # Read the contents of the HTML file into memory as a string
-        with open(html_file_path, 'r', encoding='utf-8') as file:
+        with open(html_file_path, 'r', encoding='utf-8', errors='replace') as file:
             html_content = file.read()
         # Use beautiful soup to convert html to plain text
         soup = BeautifulSoup(html_content, 'html.parser')
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     text_analyzer = TextSentimentAnalyser(lm_word_list_df)
     # 3. Pass in company ticker and year to calculate sentiment. If company does not have 10k
     # that year it will return null
-    sentiment = text_analyzer.get_sentiment('AAPL', 2012)
+    sentiment = text_analyzer.get_sentiment('KBAL', 2010)
     print(sentiment)
 
 
