@@ -1,1 +1,1 @@
-# company-earining-projection
+# company-earining-projection project
